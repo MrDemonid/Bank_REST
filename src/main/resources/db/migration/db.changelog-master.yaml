@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/migration/02-auth-schema.yaml
+  - include:
+      file: db/migration/03-schema.yaml
+  - include:
+      file: db/migration/04-auth-data.yaml

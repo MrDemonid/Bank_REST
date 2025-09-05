@@ -1,0 +1,13 @@
+### @env=dev
+
+### Создание карты
+POST {{host}}/api/cards/create
+Authorization: Bearer {{$auth.token("local-oauth")}}
+Content-Type: application/json
+
+{
+  "userId": "812ec722-9ade-4d65-abf5-d97caf65ef31",
+  "cardNumber": "1111-2222 3333 6666",
+  "expiryDate": "2029-08",
+  "balance": "100.50"
+}

@@ -1,0 +1,12 @@
+### @env=dev
+# Запрос на выборку пользователей
+POST {{host}}/api/users/get-all?page=0&size=10
+Authorization: Bearer {{$auth.token("local-oauth")}}
+Content-Type: application/json
+
+{
+  "username": null,
+  "email": null,
+  "enabled": null,
+  "role": null
+}

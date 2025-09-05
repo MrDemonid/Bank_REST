@@ -1,0 +1,31 @@
+# Добавил условия, чтобы Liquibase не падал при попытке создать уже созданное.
+databaseChangeLog:
+  - changeSet:
+      id: data-1
+      author: andrei
+      preConditions:
+        onFail: MARK_RAN
+        sqlCheck:
+          expectedResult: "0"
+          sql: "SELECT COUNT(*) FROM roles WHERE name='ROLE_USER'"
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "ROLE_USER" }
+              - column: { name: description, value: "для авторизированных пользователей" }
+
+  - changeSet:
+      id: data-2
+      author: andrei
+      preConditions:
+        onFail: MARK_RAN
+        sqlCheck:
+          expectedResult: "0"
+          sql: "SELECT COUNT(*) FROM roles WHERE name='ROLE_ADMIN'"
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "ROLE_ADMIN" }
+              - column: { name: description, value: "для админов" }

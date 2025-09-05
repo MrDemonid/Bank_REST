@@ -1,0 +1,805 @@
+openapi: 3.1.0
+info:
+  title: Разработка Системы Управления Банковскими Картами
+  description: "Создание и управление картами, переводы между своими счетами, созд\
+    ание и управление пользователями"
+  contact:
+    name: Andrey Hlus
+    url: https://github.com/MrDemonid
+    email: andnot@yandex.ru
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+security:
+- oauth2: []
+tags:
+- name: Users controller
+  description: REST API для управления пользователями. Требует роли 'ADMIN.
+- name: Card controller
+  description: REST API для управления банковскими картами.
+paths:
+  /api/users/update:
+    put:
+      tags:
+      - Users controller
+      summary: Обновление данных пользователя
+      description: Обновляет данные существующего пользователя.
+      operationId: updateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+        required: true
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Данные пользователя успешно обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/cards/block/{userId}/{id}:
+    put:
+      tags:
+      - Card controller
+      summary: Блокировка карты
+      description: "Блокирует карту, меняя её статус в базе данных. Только для рол\
+        и ADMIN."
+      operationId: blockCard
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Карта успешно заблокирована
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CardResponse"
+  /api/cards/activate/{userId}/{id}:
+    put:
+      tags:
+      - Card controller
+      summary: Активация карты
+      description: "Активирует новую карту, меняя её статус в базе данных. Только\
+        \ для роли ADMIN."
+      operationId: activateCard
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Карта успешно активирована
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CardResponse"
+  /api/users/get-all:
+    post:
+      tags:
+      - Users controller
+      summary: Список пользователей
+      description: Возвращает список пользователей с поддержкой фильтрации и пагинации.
+      operationId: getAllUsers
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserFilter"
+        required: true
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Список пользователей успешно получен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageDTOUserResponse"
+  /api/users/create:
+    post:
+      tags:
+      - Users controller
+      summary: Создание пользователя
+      description: Добавляет нового пользователя в базу данных пользователей.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignUpRequest"
+        required: true
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Пользователь успешно создан
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/cards/transfer:
+    post:
+      tags:
+      - Card controller
+      summary: Перевод средств с карты на карту
+      description: Перевод средств между картами пользователя.. Для роли USER.
+      operationId: transferCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequest"
+        required: true
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Средства успешно переведены
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/cards/get-cards/{id}:
+    post:
+      tags:
+      - Card controller
+      summary: Просмотр карт пользователя
+      description: "Просмотр пользователем только своих карт из базы данных, испол\
+        ьзуя фильтр и пагинацию. Для роли USER."
+      operationId: getUserCards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardFilter"
+        required: true
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Список карт успешно получен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageDTOCardResponse"
+  /api/cards/get-all:
+    post:
+      tags:
+      - Card controller
+      summary: Просмотр карт
+      description: "Просмотр всех карт из базы данных, используя фильтр и пагинаци\
+        ю. Только для роли ADMIN."
+      operationId: getAllCards
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardFilter"
+        required: true
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Список карт успешно получен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageDTOCardResponse"
+  /api/cards/create:
+    post:
+      tags:
+      - Card controller
+      summary: Создание новой карты
+      description: Создает новую карту и добавляет в базу данных. Только для роли
+        ADMIN.
+      operationId: createCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardCreateRequest"
+        required: true
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Карта успешно создана
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CardResponse"
+  /api/cards/request-block/{userId}/{cardId}:
+    get:
+      tags:
+      - Card controller
+      summary: Запрос на блокировку карты
+      description: "Запрос пользователя на блокировку его карты. Запрос будет напр\
+        авлен в отдельную базу данных, для дальнейшего рассмотрения администраторо\
+        м.. Для роли USER."
+      operationId: requestBlockCard
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: cardId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Запрос на блокировку успешно оформлен
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/cards/balance/{id}/{cardId}:
+    get:
+      tags:
+      - Card controller
+      summary: Запрос баланса
+      description: Запрос баланса карты пользователя.. Для роли USER.
+      operationId: getBalance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: cardId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Возвращен баланс карты
+          content:
+            '*/*':
+              schema:
+                type: number
+  /api/users/{id}:
+    delete:
+      tags:
+      - Users controller
+      summary: Удаление пользователя
+      description: Удаляет пользователя по его ID из базы данных.
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        description: ID пользователя
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Пользователь успешно удалён
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/cards/{userId}/{id}:
+    delete:
+      tags:
+      - Card controller
+      summary: Удаление карты
+      description: Удаляет карту из базы данных. Только для роли ADMIN.
+      operationId: deleteCard
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Некорректные данные или ошибка сервиса
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Пользователь не аутентифицирован.
+        "403":
+          description: Нет прав доступа
+        "200":
+          description: Карта успешно удалена
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    UpdateUserRequest:
+      type: object
+      description: Запрос на создание нового пользователя.
+      properties:
+        userName:
+          type: string
+          description: Имя пользователя
+          example: Andrey
+        email:
+          type: string
+          description: Электронная почта
+          example: andrey@gmail.com
+        password:
+          type: string
+          description: Пароль
+          example: 12345678
+        roles:
+          type: array
+          description: Роли пользователя
+          example:
+          - USER
+          - ADMIN
+          items:
+            type: string
+          uniqueItems: true
+        id:
+          type: string
+          format: uuid
+          description: ID пользователя (для update)
+          example: fb705a45-004d-4d60-989f-daa3e8572c49
+        enabled:
+          type: boolean
+          description: Активен ли пользователь
+          example: true
+    ErrorResponse:
+      type: object
+      description: Класс для возврата ошибки выполнения API
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Время возникновения ошибки
+          example: 2025-08-29T22:50:43.284262900
+        errorCode:
+          type: integer
+          format: int32
+          description: Конкретизирующий код ошибки (из BankCardErrorCodes)
+          example: 1
+        status:
+          type: integer
+          format: int32
+          description: Код ошибки
+          example: 400
+        error:
+          type: string
+          description: Тип ошибки
+          example: BAD_REQUEST
+        message:
+          type: string
+          description: Описание ошибки
+          example: "Ошибка операции с картой: card does not exist"
+        path:
+          type: string
+          description: Эндпоинт
+          example: /api/cards/create
+    UserResponse:
+      type: object
+      description: Информация о пользователе.
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: ID пользователя
+          example: fb705a45-004d-4d60-989f-daa3e8572c49
+        userName:
+          type: string
+          description: Имя пользователя
+          example: Ivan
+        email:
+          type: string
+          description: Электронная почта
+          example: ivan@gmail.com
+        enabled:
+          type: boolean
+          description: Активен ли пользователь
+          example: true
+        roles:
+          type: array
+          description: Роли пользователя
+          example:
+          - USER
+          - ADMIN
+          items:
+            type: string
+          uniqueItems: true
+    CardResponse:
+      type: object
+      description: Информация по карте.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID карты
+          example: 1
+        cardNumber:
+          type: string
+          description: Номер карты
+          example: '**** **** **** 4444'
+        expiryDate:
+          type: string
+          description: До какой даты годна
+          example: 2028-08
+        status:
+          type: string
+          description: Текущий статус
+          enum:
+          - ACTIVE
+          - BLOCKED
+          - EXPIRED
+          example: ACTIVE
+        balance:
+          type: number
+          description: Средства на карте
+          example: 100.0
+        userId:
+          type: string
+          format: uuid
+          description: ID пользователя
+          example: fb705a45-004d-4d60-989f-daa3e8572c49
+    UserFilter:
+      type: object
+      description: "Фильтр для выборки пользователй из БД по заданным параметрам.\
+        \ Если поле равно null, то он не учитывается."
+      properties:
+        username:
+          type: string
+          description: Имя пользователя
+          example: Ivan
+        email:
+          type: string
+          description: Искать по электронной почте
+          example: '@gmail.com'
+        enabled:
+          type: boolean
+          description: Искать активных или не активированных пользователей
+          example: true
+        role:
+          type: string
+          description: Искать по заданной роли
+          example: USER
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    PageDTOUserResponse:
+      type: object
+      description: Страница выборки данных.
+      properties:
+        content:
+          type: array
+          description: Список объектов выборки
+          items:
+            $ref: "#/components/schemas/UserResponse"
+        totalPages:
+          type: integer
+          format: int32
+          description: Доступных страниц для выборок (ceil(totalElements / size))
+        totalElements:
+          type: integer
+          format: int64
+          description: Всего доступных элементов в БД для выборки
+        size:
+          type: integer
+          format: int32
+          description: Элементов на странице
+        number:
+          type: integer
+          format: int32
+          description: Текущая страница (нумерация с нуля)
+    SignUpRequest:
+      type: object
+      description: Запрос на создание нового пользователя.
+      properties:
+        userName:
+          type: string
+          description: Имя пользователя
+          example: Andrey
+        email:
+          type: string
+          description: Электронная почта
+          example: andrey@gmail.com
+        password:
+          type: string
+          description: Пароль
+          example: 12345678
+        roles:
+          type: array
+          description: Роли пользователя
+          example:
+          - USER
+          - ADMIN
+          items:
+            type: string
+          uniqueItems: true
+    TransferRequest:
+      type: object
+      description: Запрос на перевод средств с карты на карту.
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: ID пользователя
+          example: fb705a45-004d-4d60-989f-daa3e8572c49
+        fromCardId:
+          type: integer
+          format: int64
+          description: ID карты-источника
+        toCardId:
+          type: integer
+          format: int64
+          description: ID карты-приемника
+        amount:
+          type: number
+          description: Количество переводимых средств
+          example: 100.5
+    CardFilter:
+      type: object
+      description: "Фильтр для выборки карт из БД по заданным параметрам. Если пол\
+        е равно null, то он не учитывается."
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: Идентификатор пользователя
+          example: e493a2f3-f1ea-4041-a3d7-28bc88b2f423
+        cardNumber:
+          type: string
+          description: Полный номер карты пользователя
+          examples:
+          - 1111 2222 3333 4444
+          - "1111222233334444"
+          - 1111-2222-3333-4444
+        cardStatus:
+          type: string
+          description: Искать по статусу карты
+          enum:
+          - ACTIVE
+          - BLOCKED
+          - EXPIRED
+          example: BLOCKED
+        expiryDate:
+          type: string
+          description: Искать карты действительные до заданной даты
+          example: 2028-06
+    PageDTOCardResponse:
+      type: object
+      description: Страница выборки данных.
+      properties:
+        content:
+          type: array
+          description: Список объектов выборки
+          items:
+            $ref: "#/components/schemas/CardResponse"
+        totalPages:
+          type: integer
+          format: int32
+          description: Доступных страниц для выборок (ceil(totalElements / size))
+        totalElements:
+          type: integer
+          format: int64
+          description: Всего доступных элементов в БД для выборки
+        size:
+          type: integer
+          format: int32
+          description: Элементов на странице
+        number:
+          type: integer
+          format: int32
+          description: Текущая страница (нумерация с нуля)
+    CardCreateRequest:
+      type: object
+      description: Запрос на создание новой карты.
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: ID пользователя
+          example: fb705a45-004d-4d60-989f-daa3e8572c49
+        cardNumber:
+          type: string
+          description: Номер карты
+          examples:
+          - "1111222233334444"
+          - 1111-2222-3333-4444
+          - 1111 2222 3333 4444
+        expiryDate:
+          type: string
+          description: До какой даты годна
+          example: 2028-08
+        balance:
+          type: number
+          description: Начальный капитал на карте
+          example: 100.5
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:8080/oauth2/token
+          scopes:
+            read: Read access
+            write: Write access

@@ -1,0 +1,7 @@
+### @env=dev
+# в случае ошибки 401 наводим курсор на auth.token и жмем Alt+Enter, выбираем Force Acquire Auth Token.
+@userId=812ec722-9ade-4d65-abf5-d97caf65ef31
+@id=3
+PUT http://localhost:8080/api/cards/block/{{userId}}/{{id}}
+Authorization: Bearer {{$auth.token("local-oauth")}}
+Content-Type: application/json

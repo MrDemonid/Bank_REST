@@ -1,0 +1,4 @@
+### @env=dev
+@id=0fe6c98b-88aa-4928-87f4-76a644748e00
+DELETE {{host}}/api/users/{{id}}
+Authorization: Bearer {{$auth.token("local-oauth")}}

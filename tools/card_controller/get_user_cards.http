@@ -1,0 +1,12 @@
+### @env=dev
+@id=812ec722-9ade-4d65-abf5-d97caf65ef31
+POST {{host}}/api/cards/get-cards/{{id}}?page=0&size=20
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("local-oauth")}}
+
+{
+  "userId": null,
+  "cardNumber": null,
+  "cardStatus": null,
+  "expiryDate": "2028-08"
+}

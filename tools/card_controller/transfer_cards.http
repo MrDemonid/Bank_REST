@@ -1,0 +1,11 @@
+### @env=dev
+POST {{host}}/api/cards/transfer
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("local-oauth")}}
+
+{
+  "userId": "812ec722-9ade-4d65-abf5-d97caf65ef31",
+  "fromCardId": 3,
+  "toCardId": 1,
+  "amount": "20.15"
+}

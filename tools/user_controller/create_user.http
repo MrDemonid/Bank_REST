@@ -1,0 +1,13 @@
+### @env=dev
+# Добавление нового пользователя.
+POST {{host}}/api/users/create
+Authorization: Bearer {{$auth.token("local-oauth")}}
+Content-Type: application/json
+
+{
+  "userName": "Andrey",
+  "password": "test-password",
+  "email": "ndrey7@rambler.ru",
+  "enabled": true,
+  "roles": ["ADMIN","USER"]
+}

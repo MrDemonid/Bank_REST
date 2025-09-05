@@ -1,0 +1,6 @@
+### @env=dev
+@userId=812ec722-9ade-4d65-abf5-d97caf65ef31
+@cardId=2
+GET {{host}}/api/cards/request-block/{{userId}}/{{cardId}}
+Authorization: Bearer {{$auth.token("local-oauth")}}
+Content-Type: application/json

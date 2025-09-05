@@ -1,0 +1,14 @@
+### @env=dev
+# Апдейт данных пользователя
+PUT {{host}}/api/users/update
+Authorization: Bearer {{$auth.token("local-oauth")}}
+Content-Type: application/json
+
+{
+  "id": "812ec722-9ade-4d65-abf5-d97caf65ef31",
+  "userName": "Andrey",
+  "password": "dddddddd",
+  "email": "ndrey7@rambler.ru",
+  "enabled": true,
+  "roles": ["ROLE_USER","ADMIN"]
+}

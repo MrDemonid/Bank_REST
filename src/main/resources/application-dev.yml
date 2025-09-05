@@ -1,0 +1,24 @@
+spring:
+  # настройки безопасности
+  security:
+    oauth2:
+      # клиент для входа через CLIENT_CREDENTIALS, на время разработки!
+      auth-clients:
+        dev:
+          client-name: DevelopmentClient
+          client-id: ${CLIENT_DEV_ID:apmid}            # дефолтное значение client-id для регистрации клиента
+          client-secret: ${CLIENT_DEV_SECRET:secret}     # дефолтное значение client-secret для регистрации клиента
+          redirect-uris: []
+          grant-types:
+            - client_credentials
+          scopes:
+            - read
+            - write
+          expiration-time: 30         # время валидности токена (минут)
+
+# swagger
+springdoc:
+  show-actuator: false
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

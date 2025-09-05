@@ -1,0 +1,84 @@
+#
+# application.yml — главный конфигурационный файл Spring Boot.
+server:
+  port: ${BANK_CARDS_PORT:8080}
+
+spring:
+  application:
+    name: "BANKCARDS-SERVICE"
+  profiles:
+    active: dev       # подключаем профиль dev, на время разработки. В проде убрать!!!
+
+  output.ansi.enabled: ALWAYS
+
+# настройки безопасности
+  security:
+    oauth2:
+      # сервер аутентификации и авторизации
+      issuer-url: ${OAUTH2_ISSUER_URI:http://localhost:8080}
+      auth-clients:
+        default:
+          client-name: BankClient
+          client-id: ${CLIENT_ID:client}            # дефолтное значение client-id для регистрации клиента
+          client-secret: ${CLIENT_SECRET:secret}     # дефолтное значение client-secret для регистрации клиента
+          redirect-uris:
+            - http://127.0.0.1:8080/login/oauth2/code/bank-client   # bank-client должен быть зарегистрирован в клиенте!
+            - http://192.168.1.*:8080/login/oauth2/code/bank-client
+          grant-types:
+            - authorization_code
+            - refresh_token
+          scopes:
+            - openid
+            - read
+            - write
+          expiration-time: 30         # время валидности токена (минут)
+
+      # сервер ресурсов
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:8080} # сервер аутентификации
+
+
+# SQL database
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/bank_db
+    username: ${MYSQL_USER:admin}
+    password: ${MYSQL_PASSWORD:}admin
+# Spring Jpa Hibernate
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+        show_sql: false
+        format_sql: true
+        highlight_sql: true
+    generate-ddl: false
+    defer-datasource-initialization: false
+    open-in-view: false
+  # автозапуск скриптов 'schema.sql' и 'data.sql'
+  sql:
+    init:
+      mode: never           # не нужен
+
+# миграции
+  liquibase:
+    change-log: classpath:db/migration/db.changelog-master.yaml
+    enabled: true
+    drop-first: false
+
+# ключи для шифрования (для дев сойдет, но для прода лучше использовать Secret Manager (Vault, AWS SM, Azure KV и тд.)
+# сгенерированы через: openssl rand -base64 32
+var:
+  card:
+    hmac:
+      secret: Nn2lEsSSml1Rnp9ctqH1dz6LgjsCC7nxmCqB1TXghx0=
+    aes:
+      secret: CS3mf6u9VSWwN+JoOGj3Vlv5jqQUfJppxWVRbO+er4g=
+
+#Что нужно сделать:
+#  - Указать настройки подключения к базе данных.
+#  - Указать порт приложения.
+#  - Настроить параметры безопасности и JWT.
+#  - Включить Swagger UI (подключен в dev-профиле).
